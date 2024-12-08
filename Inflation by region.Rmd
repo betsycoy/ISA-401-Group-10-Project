@@ -1,0 +1,138 @@
+---
+title: "Inflation Rate by Region"
+author: "Tara Hoffman"
+date: "2024-12-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+Midwest:
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/mountain-plains/news-release/consumerpriceindex_midwest.htm") |> rvest::html_elements("#tablea > tbody")|> rvest:: html_table() -> midwest
+
+midwest<- midwest[[1]]
+
+colnames(midwest)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+midwest$Region<- "Midwest"
+
+midwest<-midwest[,-c(2,4,6,8,10)]
+
+colnames(midwest)<- c("Month","2020", "2021", "2022","2023","2024", "Region")
+
+midwest<- midwest[, c("Region", "Month", "2020", "2021","2022", "2023", "2024")]
+
+midwest<- tidyr::pivot_longer(
+  
+  data= midwest, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+NorthEast: 
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/mid-atlantic/news-release/consumerpriceindex_northeast.htm") |> rvest::html_elements("#CPITableANortheast\\.xlsx > tbody")|> rvest:: html_table() -> northeast
+
+northeast<- northeast[[1]]
+
+colnames(northeast)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+northeast$Region<- "Northeast"
+
+northeast<- northeast[,-c(2,4,6,8,10)]
+
+colnames(northeast)<- c("Month","2020", "2021", "2022","2023","2024", "Region")
+
+northeast<- northeast[, c("Region", "Month", "2020", "2021","2022", "2023", "2024")]
+
+northeast<- tidyr::pivot_longer(
+  
+  data= northeast, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+
+West:
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/west/news-release/consumerpriceindex_west.htm") |> rvest::html_elements("#CPITableAWest\\.xlsx > tbody")|> rvest:: html_table() -> west
+
+west<- west[[1]]
+
+colnames(west)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+west$Region<- "West"
+
+west<- west[,-c(2,4,6,8,10)]
+
+colnames(west)<- c("Month","2020", "2021", "2022","2023","2024", "Region")
+
+west<- west[, c("Region", "Month", "2020", "2021","2022", "2023", "2024")]
+
+west<- tidyr::pivot_longer(
+  
+  data= west, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+South: 
+https://www.bls.gov/regions/southeast/news-release/consumerpriceindex_south.htm
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/southeast/news-release/consumerpriceindex_south.htm") |> rvest::html_elements("#CPITableASouth\\.xlsx > tbody")|> rvest:: html_table() -> south
+
+south<- south[[1]]
+
+colnames(south)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+south$Region<- "South"
+
+south<- south[,-c(2,4,6,8,10)]
+
+colnames(south)<- c("Month","2020", "2021", "2022","2023","2024", "Region")
+
+south<- south[, c("Region", "Month", "2020", "2021","2022", "2023", "2024")]
+
+south<- tidyr::pivot_longer(
+  
+  data= south, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+
+
+```
+
+```{r}
+regional_inflation_data<- rbind(midwest,northeast,south,west)
+
+readr:: write_csv(regional_inflation_data, "regional_inflation_data2.csv")
+```
+
