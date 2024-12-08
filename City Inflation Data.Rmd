@@ -1,0 +1,361 @@
+---
+title: "Inflation by State"
+author: "Tara Hoffman"
+date: "2024-12-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+https://www.bls.gov/regions/subjects/consumer-price-indexes.htm#AZ
+
+
+New York: 8,804,190
+Los Angeles: 3,898,747
+Chicago: 2,746,388
+Houston: 2,304,580
+Phoenix: 1,608,139
+Philadelphia: 1,603,797
+San Antonio: 1,434,625
+San Diego: 1,386,932
+Dallas: 1,304,379
+San Jose: 1,013,240
+
+
+
+Largest Metropolitan Areas: 
+https://www.thoughtco.com/largest-metropolitan-areas-1435135
+
+1.New York
+2.Los Angelos
+3.Chicago  
+4.Dallas + Fort Worth- NO Data
+5. Houston - No Data
+6. DC 
+7. Miami + Ft.Lauderdale
+8. Philadelphia 
+9. Atlanta
+10. Pheonix 
+
+
+
+New York:
+```{r}
+
+
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/northeast/news-release/consumerpriceindex_newyork.htm") |> rvest::html_element("#CPITableANewYork\\.xlsx > tbody") |> rvest::html_table() -> newyork
+
+colnames(newyork)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+newyork$city<- "New York City"
+
+newyork<-newyork[,-c(2,4,6,8,10)]
+
+colnames(newyork)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+newyork <- newyork[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+newyork<- tidyr::pivot_longer(
+  
+  data= newyork, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+
+
+```
+
+
+
+Los Angeles:
+```{r}
+
+#Los Angeles
+
+
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/west/news-release/consumerpriceindex_losangeles.htm") |> rvest::html_elements("#CPITableALosAngeles\\.xlsx > tbody")|> rvest:: html_table() -> losangeles
+
+losangeles<- losangeles[[1]]
+
+colnames(losangeles)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+losangeles$city<- "Los Angeles"
+
+losangeles<-losangeles[,-c(2,4,6,8,10)]
+
+colnames(losangeles)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+losangeles<- losangeles[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+losangeles<- tidyr::pivot_longer(
+  
+  data= losangeles, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+
+
+Chicago: 
+
+- has revised data notated with (r)
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/midwest/news-release/consumerpriceindex_chicago.htm") |> rvest::html_elements("#CPITableAChicago\\.xlsx > tbody")|> rvest:: html_table() -> chicago
+
+chicago <- chicago[[1]]
+
+colnames(chicago)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+chicago$city<- "Chicago"
+
+chicago<-chicago[,-c(2,4,6,8,10)]
+
+colnames(chicago)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+chicago<- chicago[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+#replacing revised data(r) with numeric
+
+
+chicago [6,5]<- "8.9"
+chicago [7,5]<- "8.4"
+chicago [8,5]<- "8.3" 
+chicago [9,5]<- "8.2"
+chicago [10,5]<-"7.7"
+
+chicago$`2022` <- as.numeric(chicago$`2022`)
+
+chicago<- tidyr::pivot_longer(
+  
+  data= chicago, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+#delete rows 61-65
+chicago<- chicago[-c(61:65),]
+
+
+```
+
+
+DC - Data only collected every other month 
+```{r}
+
+
+
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/mid-atlantic/news-release/consumerpriceindex_washingtondc.htm") |> rvest::html_elements("#CPITableAWashington\\.xlsx > tbody")|> rvest:: html_table() -> dc
+
+dc<- dc[[1]]
+
+colnames(dc)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+dc$city<- "DC"
+
+dc<-dc[,-c(2,4,6,8,10)]
+
+colnames(dc)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+dc<- dc[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+dc<- tidyr::pivot_longer(
+  
+  data= dc, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+
+Miami Ft. Lauderdale:
+```{r}
+
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/southeast/news-release/consumerpriceindex_miami.htm") |> rvest::html_elements("#CPITableAMiami\\.xlsx > tbody")|> rvest:: html_table() -> miami
+
+miami<- miami[[1]]
+
+colnames(miami)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+miami$city<- "Miami"
+
+miami<-miami[,-c(2,4,6,8,10)]
+
+colnames(miami)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+miami<- miami[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+miami<- tidyr::pivot_longer(
+  
+  data= miami, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+```
+
+
+Philadelphia: 
+
+```{r}
+
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/mid-atlantic/news-release/consumerpriceindex_philadelphia.htm") |> rvest::html_elements("#CPITableAPhiladelphia\\.xlsx > tbody")|> rvest:: html_table() -> philadelphia
+
+philadelphia<- philadelphia[[1]]
+
+colnames(philadelphia)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+philadelphia$city<- "Philadelphia"
+
+philadelphia<-philadelphia[,-c(2,4,6,8,10)]
+
+colnames(philadelphia)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+philadelphia<- philadelphia[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+philadelphia<- tidyr::pivot_longer(
+  
+  data= philadelphia, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+```
+
+
+
+Atlanta: 
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/southeast/news-release/consumerpriceindex_atlanta.htm") |> rvest::html_elements("#CPITableAAtlanta\\.xlsx > tbody")|> rvest:: html_table() -> atlanta
+
+atlanta<- atlanta[[1]]
+
+colnames(atlanta)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+atlanta$city<- "Atlanta"
+
+atlanta<-atlanta[,-c(2,4,6,8,10)]
+
+colnames(atlanta)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+atlanta<- atlanta[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+atlanta<- tidyr::pivot_longer(
+  
+  data= atlanta, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+```
+
+
+Anchorage: 
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/west/news-release/consumerpriceindex_anchorage.htm") |> rvest::html_elements("#tableA\\.xlsx > tbody")|> rvest:: html_table() -> anchorage
+
+anchorage<- anchorage[[1]]
+
+colnames(anchorage)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+anchorage$city<- "Anchorage"
+
+anchorage<-anchorage[,-c(2,4,6,8,10)]
+
+colnames(anchorage)<- c("Month","2020", "2021", "2022","2023","2024", "City")
+
+anchorage<- anchorage[, c("City", "Month", "2020", "2021","2022", "2023", "2024")]
+
+anchorage<- tidyr::pivot_longer(
+  
+  data= anchorage, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+```
+
+
+
+
+
+
+By Region: 
+
+Mountain Plains: Colorado, Kansas, Missouri, Montana, Utah, Wyoming
+
+South
+
+West: Alaska, Arizona, California, Guam, Hawaii, Idaho, Nevada, Oregon, Washington
+NorthEast
+Midwest
+
+South east: Alabama, Florida, Georgia, Kentucky, Mississippi, North Carolina, South Carolina, Tennessee
+
+Mid Atlantic: Delaware, District of Columbia, Maryland, New Jersey, Pennsylvania, Virginia, West Virginia
+
+Midwest
+
+
+Midwest:
+
+```{r}
+#getting 12 month average in each year
+rvest:: read_html_live("https://www.bls.gov/regions/mountain-plains/news-release/consumerpriceindex_midwest.htm") |> rvest::html_elements("#tablea > tbody")|> rvest:: html_table() -> midwest
+
+midwest<- midwest[[1]]
+
+colnames(midwest)<- c("Month", "2020 3mo", "2020 12mo", "2021 3mo", "2021 12mo", "2022 3mo", "2022 12mo", "2023 3mo", "2023 12mo", "2024 3mo", "2024 12mo")
+
+midwest$Region<- "Midwest"
+
+midwest<-midwest[,-c(2,4,6,8,10)]
+
+colnames(midwest)<- c("Month","2020", "2021", "2022","2023","2024", "Region")
+
+midwest<- midwest[, c("Region", "Month", "2020", "2021","2022", "2023", "2024")]
+
+midwest<- tidyr::pivot_longer(
+  
+  data= midwest, 
+  cols = "2020":"2024", 
+  names_to = "Year", 
+  values_to = "12 mo Avg Inflation"
+)
+
+
+```
+
+https://www.bls.gov/regions/west/news-release/consumerpriceindex_west.htm
+
+Western: 
+
+
+
+
+
