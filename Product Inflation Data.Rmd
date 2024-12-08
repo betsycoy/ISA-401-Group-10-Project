@@ -1,0 +1,58 @@
+---
+title: "Product Inflation Data"
+author: "Lainey Phillips"
+date: "2024-12-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Pivot Longer Historical CPI 1974 - 2023
+```{r}
+library(readxl)
+hist_cpi <- read_excel("Desktop/historicalcpi (2).xlsx", skip = 1) |> 
+  dplyr::mutate(
+    dplyr::across(`1974`:`2023`, as.numeric)
+  )
+
+hist_cpi = hist_cpi[-c(23:25), ]
+
+hist_cpi <- hist_cpi |> tidyr::pivot_longer(
+  cols = `1974`:`2023`,
+  names_to = "year",
+  values_to = "CPI"
+) 
+
+readr::write_csv(hist_cpi, 'hist_cpi.csv')
+```
+
+## Pivot Longer CPI By Product Category 
+```{r}
+library(readxl)
+CPI_Pro_Cat <- read_excel("CPI_Pro_Cat.xlsx")
+
+CPI_Pro_Cat <- CPI_Pro_Cat |> tidyr::pivot_longer(
+  cols= `All items`:`Education and communication`, 
+  names_to = "Product Category", 
+  values_to = 'CPI'
+)
+
+readr::write_csv(CPI_Pro_Cat, 'CPI_by_Product_Category.csv')
+```
+
+## Pivot Longer Price by Food and Energy
+```{r}
+library(readxl)
+price_food_energy <- read_excel("price_food_energy.xlsx")
+
+price_food_energy <- price_food_energy |> tidyr::pivot_longer(
+  cols = `Bananas, per lb.`:`Milk, fresh, whole, fortified, per gal.`,
+  names_to = "Product",
+  values_to = 'Price'
+)
+
+readr::write_csv(price_food_energy, 'Price_of_Food_Energy.csv')
+```
+
