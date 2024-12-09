@@ -1,0 +1,66 @@
+---
+title: "CPI over time and Yearly Inflation Rates"
+output: html_document
+date: "2024-12-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+rvest::read_html_live("https://usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/") |> 
+  rvest::html_element("div:nth-child(8) > table") |> 
+  rvest::html_table(header = F) -> cpi_data
+
+colnames(cpi_data) = cpi_data[2, ]
+cpi_data = cpi_data[-c(1,2), ]
+
+cpi_data = cpi_data |> 
+  dplyr::mutate(dplyr::across(is.character, as.numeric))
+
+#delete last 3 columns of unnecessary data
+cpi_data<- cpi_data[1:13]
+
+
+#Pivot longer to make unit of analysis month-year
+
+cpi_data<- cpi_data |> tidyr::pivot_longer(
+  cols = Jan:Dec,
+  names_to = "month",
+  values_to = "CPI"
+)
+
+cpi_data$month_year<- paste0(cpi_data$month," ", cpi_data$Year)
+
+cpi_data<- cpi_data[3:4]
+
+cpi_data<- cpi_data[, c(2, 1)]
+
+#getting the CPI by year to calculate yearly inflation rate (taking the June Data)
+
+
+readr:: write_csv(cpi_data, "yearly_inflation_data2.csv")
+
+```
+
+```{r}
+
+rvest::read_html_live("https://usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/") |> 
+  rvest::html_element("div:nth-child(8) > table") |> 
+  rvest::html_table(header = F) -> cpi_data
+
+colnames(cpi_data) = cpi_data[2, ]
+cpi_data = cpi_data[-c(1,2), ]
+
+cpi_data = cpi_data |> 
+  dplyr::mutate(dplyr::across(is.character, as.numeric))
+
+cpi_data_percent_change <- cpi_data[, c("Year", "Avg-Avg")]
+
+
+readr:: write_csv(cpi_data_percent_change, "cpi_percentchange.csv")
+
+```
+
